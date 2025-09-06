@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 input;
     private Animator animator;
     public LayerMask solidObjectsLayer;
+    public LayerMask interactableLayer;
 
     private void Awake()
     {
@@ -21,11 +22,11 @@ public class PlayerController : MonoBehaviour
         {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
-            
+
             Debug.Log("Input X: " + input.x);
             Debug.Log("Input Y: " + input.y);
 
-            if (input.x != 0 ) input.y = 0;
+            if (input.x != 0) input.y = 0;
 
             if (input != Vector2.zero)
             {
@@ -37,12 +38,29 @@ public class PlayerController : MonoBehaviour
                 targetPos.x += input.x;
                 targetPos.y += input.y;
 
-                if(IsWalkable(targetPos))
+                if (IsWalkable(targetPos))
                     StartCoroutine(Move(targetPos));
             }
         }
 
         animator.SetBool("isMoving", isMoving);
+
+        if (Input.GetKeyDown(KeyCode.Z))
+            Interact();
+    }
+
+    void Interact()
+    {
+        var faceDir = new Vector3(animator.GetFloat("moveX"), animator.GetFloat("moveY"));
+        var interactPos = transform.position + faceDir;
+
+        //Debug.DrawLine(transform.position, interactPos, Color.red, 1f);
+
+        var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
+        if (collider != null)
+        {
+            Debug.Log("there is a NPC here!");
+        }
     }
 
     IEnumerator Move(Vector3 targetPos)
@@ -58,8 +76,9 @@ public class PlayerController : MonoBehaviour
         isMoving = false;
     }
 
-    private bool IsWalkable(Vector3 targetPos) {
-        if(Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer) != null)
+    private bool IsWalkable(Vector3 targetPos)
+    {
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactableLayer) != null)
         {
             return false;
         }
