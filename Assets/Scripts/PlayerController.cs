@@ -16,15 +16,15 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void Update()
+    public void HandleUpdate()
     {
         if (!isMoving)
         {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
 
-            Debug.Log("Input X: " + input.x);
-            Debug.Log("Input Y: " + input.y);
+            //Debug.Log("Input X: " + input.x);
+            //Debug.Log("Input Y: " + input.y);
 
             if (input.x != 0) input.y = 0;
 
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
         var collider = Physics2D.OverlapCircle(interactPos, 0.2f, interactableLayer);
         if (collider != null)
         {
-            Debug.Log("there is a NPC here!");
+            collider.GetComponent<Interactable>()?.Interact();
         }
     }
 
